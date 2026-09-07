@@ -583,6 +583,7 @@ function syncCropEditor() {
   cropSelection.style.width = `${cropState.width * 100}%`;
   cropSelection.style.height = `${cropState.height * 100}%`;
   cropEditor.hidden = false;
+  // Die Beschriftung richtet sich nach der gezoomten Bildfläche, nicht nach der Panelgröße.
   syncCropLabel(area.width, area.height);
 }
 
