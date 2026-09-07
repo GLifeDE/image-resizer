@@ -7,7 +7,6 @@
 
 * **ui:** result panel beside the form, two-column settings, real umlauts ([#6](https://github.com/mmars-bit/image-resizer/issues/6)) ([f3fe9da](https://github.com/mmars-bit/image-resizer/commit/f3fe9dac62627c306b06def9a4096b0f55356319))
 * **web:** add zoom and pan to both image previews ([57c9d74](https://github.com/mmars-bit/image-resizer/commit/57c9d74b2c0274d8b6d6ab6763239c76765bde10))
-* **web:** zoom and pan in both previews ([f62128d](https://github.com/mmars-bit/image-resizer/commit/f62128d5387bff0235be3a1e80793f65e5715414))
 
 
 ### Bug Fixes
