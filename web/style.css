@@ -144,6 +144,12 @@ body.page-dragging::before {
 .crop-handle.top-right { top: -7px; right: -7px; cursor: nesw-resize; }
 .crop-handle.bottom-left { bottom: -7px; left: -7px; cursor: nesw-resize; }
 .crop-handle.bottom-right { right: -7px; bottom: -7px; cursor: nwse-resize; }
+.crop-handle.top, .crop-handle.bottom { left: 50%; width: 22px; height: 9px; transform: translateX(-50%); cursor: ns-resize; }
+.crop-handle.top { top: -5px; }
+.crop-handle.bottom { bottom: -5px; }
+.crop-handle.left, .crop-handle.right { top: 50%; width: 9px; height: 22px; transform: translateY(-50%); cursor: ew-resize; }
+.crop-handle.left { left: -5px; }
+.crop-handle.right { right: -5px; }
 
 .details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin: 16px 0 0; }
 .details div { min-width: 0; }

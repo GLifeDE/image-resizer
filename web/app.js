@@ -492,8 +492,8 @@ function syncConditionalOptions() {
   const cropEnabled = mode === 'crop' || mode === 'stretch';
   document.querySelector('#crop-options').hidden = !cropEnabled;
   document.querySelector('#crop-help').textContent = mode === 'crop'
-    ? 'Der Rahmen folgt dem Zielseitenverhältnis. Ziehen Sie ihn zum Verschieben oder die Ecken zum Anpassen.'
-    : 'Ziehen Sie einen freien Rahmen auf oder passen Sie ihn an den Ecken an. Halten Sie Umschalt gedrückt und ziehen Sie innerhalb des Rahmens zum Verschieben.';
+    ? 'Der Rahmen folgt dem Zielseitenverhältnis. Ziehen Sie ihn zum Verschieben oder an Ecken und Kanten zum Anpassen.'
+    : 'Ziehen Sie einen freien Rahmen auf oder passen Sie ihn an Ecken und Kanten an. Halten Sie Umschalt gedrückt und ziehen Sie innerhalb des Rahmens zum Verschieben.';
   const format = document.querySelector('#format').value;
   const lossy = ['jpeg', 'webp', 'avif'].includes(format);
   document.querySelector('#quality-wrap').hidden = !lossy;
@@ -673,7 +673,27 @@ function resizeCropSelection(point) {
   const right = startState.x + startState.width;
   const bottom = startState.y + startState.height;
   if (form.elements.mode.value === 'stretch') {
-    if (action === 'top-left') {
+    if (action === 'left') {
+      cropState.x = clamp(point.x, 0, right);
+      cropState.y = startState.y;
+      cropState.width = right - cropState.x;
+      cropState.height = startState.height;
+    } else if (action === 'right') {
+      cropState.x = startState.x;
+      cropState.y = startState.y;
+      cropState.width = clamp(point.x, startState.x, 1) - startState.x;
+      cropState.height = startState.height;
+    } else if (action === 'top') {
+      cropState.x = startState.x;
+      cropState.y = clamp(point.y, 0, bottom);
+      cropState.width = startState.width;
+      cropState.height = bottom - cropState.y;
+    } else if (action === 'bottom') {
+      cropState.x = startState.x;
+      cropState.y = startState.y;
+      cropState.width = startState.width;
+      cropState.height = clamp(point.y, startState.y, 1) - startState.y;
+    } else if (action === 'top-left') {
       cropState.x = clamp(point.x, 0, right);
       cropState.y = clamp(point.y, 0, bottom);
       cropState.width = right - cropState.x;
@@ -704,6 +724,44 @@ function resizeCropSelection(point) {
   const targetRatio = Number(widthInput.value) / Number(heightInput.value);
   const widthPerHeight = targetRatio / sourceRatio;
   if (!Number.isFinite(widthPerHeight) || widthPerHeight <= 0) return;
+
+  if (action === 'left' || action === 'right') {
+    const fromLeft = action === 'left';
+    const anchorX = fromLeft ? right : startState.x;
+    const centerY = startState.y + startState.height / 2;
+    const maximumWidth = Math.min(
+      fromLeft ? anchorX : 1 - anchorX,
+      2 * Math.min(centerY, 1 - centerY) * widthPerHeight,
+    );
+    const width = clamp(Math.abs(point.x - anchorX), 0, maximumWidth);
+    const height = width / widthPerHeight;
+    cropState = {
+      x: fromLeft ? anchorX - width : anchorX,
+      y: centerY - height / 2,
+      width,
+      height,
+    };
+    return;
+  }
+
+  if (action === 'top' || action === 'bottom') {
+    const fromTop = action === 'top';
+    const anchorY = fromTop ? bottom : startState.y;
+    const centerX = startState.x + startState.width / 2;
+    const maximumHeight = Math.min(
+      fromTop ? anchorY : 1 - anchorY,
+      2 * Math.min(centerX, 1 - centerX) / widthPerHeight,
+    );
+    const height = clamp(Math.abs(point.y - anchorY), 0, maximumHeight);
+    const width = height * widthPerHeight;
+    cropState = {
+      x: centerX - width / 2,
+      y: fromTop ? anchorY - height : anchorY,
+      width,
+      height,
+    };
+    return;
+  }
 
   const requestedHeight = Math.max(Math.abs(point.x - anchorX) / widthPerHeight, Math.abs(point.y - anchorY));
   const maximumHeight = Math.min(fromLeft ? anchorX / widthPerHeight : (1 - anchorX) / widthPerHeight, fromTop ? anchorY : 1 - anchorY);
