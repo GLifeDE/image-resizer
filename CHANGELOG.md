@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/mmars-bit/image-resizer/compare/v0.5.0...v0.6.0) (2026-09-15)
+
+
+### Features
+
+* **ui:** resize crop from edges ([aa27536](https://github.com/mmars-bit/image-resizer/commit/aa2753690d3591fee80a2774bc3e94a980c73b82))
+* **ui:** simplify resize workflow ([603313a](https://github.com/mmars-bit/image-resizer/commit/603313ac9a6ac4e17159e684a62d7a824c749354))
+
+
+### Bug Fixes
+
+* **ui:** improve proportional crop interaction ([2c7f459](https://github.com/mmars-bit/image-resizer/commit/2c7f4591f2a4cc58215a053cb0c54d1130668146))
+* **ui:** remove memory processing label ([6013aa7](https://github.com/mmars-bit/image-resizer/commit/6013aa75546d4f7f39fceca8d97ec6db5d0aa6c4))
+* **ui:** unify crop controls across modes ([64740a5](https://github.com/mmars-bit/image-resizer/commit/64740a5595b7f41246ba10ef1006f1c25788aa90))
+
 ## [0.5.0](https://github.com/mmars-bit/image-resizer/compare/v0.4.1...v0.5.0) (2026-09-07)
 
 
