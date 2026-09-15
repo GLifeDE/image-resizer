@@ -68,8 +68,8 @@ body.page-dragging::before {
 }
 
 .hero p { margin: 0; color: var(--muted); }
-.app-meta { display: flex; align-items: center; gap: 10px; font-size: .78rem; white-space: nowrap; }
-.version { padding-left: 10px; border-left: 1px solid var(--line-strong); color: var(--ink); font-variant-numeric: tabular-nums; }
+.app-meta { font-size: .78rem; white-space: nowrap; }
+.version { margin-left: 4px; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .panel {
   min-width: 0;
@@ -284,8 +284,6 @@ output { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums
 @media (max-width: 680px) {
   .shell { width: min(100% - 20px, 1440px); padding-top: 18px; }
   .hero { align-items: flex-start; }
-  .app-meta > span:first-child { display: none; }
-  .version { padding-left: 0; border-left: 0; }
   .panel { padding: 15px; }
   .drop-zone { flex-direction: column; gap: 12px; text-align: center; }
   .source-panel .preview, .preview { min-height: 190px; }
