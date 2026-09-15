@@ -493,7 +493,7 @@ function syncConditionalOptions() {
   document.querySelector('#crop-options').hidden = !cropEnabled;
   document.querySelector('#crop-help').textContent = mode === 'crop'
     ? 'Ziehen Sie außerhalb des Rahmens eine neue Auswahl auf. Im Rahmen verschieben Sie die Auswahl; Ecken und Kanten ändern ihre Größe.'
-    : 'Ziehen Sie einen freien Rahmen auf oder passen Sie ihn an Ecken und Kanten an. Halten Sie Umschalt gedrückt und ziehen Sie innerhalb des Rahmens zum Verschieben.';
+    : 'Ziehen Sie außerhalb des Rahmens eine neue freie Auswahl auf. Im Rahmen verschieben Sie die Auswahl; Ecken und Kanten ändern ihre Größe.';
   const format = document.querySelector('#format').value;
   const lossy = ['jpeg', 'webp', 'avif'].includes(format);
   document.querySelector('#quality-wrap').hidden = !lossy;
@@ -585,15 +585,15 @@ cropEditor.addEventListener('pointerdown', (event) => {
   event.preventDefault();
   const point = cropPoint(event);
   cropHoverPoint = point;
-  syncCropCursor(event.shiftKey);
+  syncCropCursor();
   const handle = event.target.closest('[data-crop-handle]');
   const startState = { ...cropState };
   const insideSelection = point.x >= cropState.x && point.x <= cropState.x + cropState.width
     && point.y >= cropState.y && point.y <= cropState.y + cropState.height;
   const stretchMode = form.elements.mode.value === 'stretch';
   const cropMode = form.elements.mode.value === 'crop';
-  const moveSelection = insideSelection && (cropMode || (stretchMode && event.shiftKey));
-  const drawSelection = stretchMode && !handle && !moveSelection;
+  const moveSelection = !handle && insideSelection;
+  const drawSelection = stretchMode && !handle && !insideSelection;
   const drawProportionalSelection = cropMode && !handle && !insideSelection;
   if (!handle && !moveSelection && !drawSelection && !drawProportionalSelection) return;
   if (drawSelection) cropState = { x: point.x, y: point.y, width: 0, height: 0 };
@@ -612,7 +612,7 @@ cropEditor.addEventListener('pointermove', (event) => {
   const point = cropPoint(event);
   cropHoverPoint = point;
   if (!cropDrag || cropDrag.pointerId !== event.pointerId || !cropState) {
-    syncCropCursor(event.shiftKey);
+    syncCropCursor();
     return;
   }
   if (cropDrag.action === 'draw') {
@@ -629,7 +629,7 @@ cropEditor.addEventListener('pointermove', (event) => {
     resizeCropSelection(point);
   }
   syncCropEditor();
-  syncCropCursor(event.shiftKey);
+  syncCropCursor();
   // Keeps pushing the preview out while the pointer keeps changing the crop.
   schedulePreview();
 });
@@ -639,12 +639,6 @@ cropEditor.addEventListener('pointercancel', endCropDrag);
 cropEditor.addEventListener('pointerleave', () => {
   cropHoverPoint = undefined;
   cropEditor.classList.remove('move-ready');
-});
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Shift') syncCropCursor(true);
-});
-document.addEventListener('keyup', (event) => {
-  if (event.key === 'Shift') syncCropCursor(false);
 });
 // Das Vorschaufeld ändert seine Größe auch ohne Fensteränderung, etwa wenn
 // das Ergebnis-Panel erscheint und die Spalte schmaler wird. Der Crop-Rahmen
@@ -803,14 +797,11 @@ function drawProportionalCrop(point) {
   };
 }
 
-function syncCropCursor(shiftKey) {
+function syncCropCursor() {
   const insideSelection = cropHoverPoint && cropState
     && cropHoverPoint.x >= cropState.x && cropHoverPoint.x <= cropState.x + cropState.width
     && cropHoverPoint.y >= cropState.y && cropHoverPoint.y <= cropState.y + cropState.height;
-  const moveReady = form.elements.mode.value === 'crop'
-    ? insideSelection
-    : Boolean(shiftKey && insideSelection);
-  cropEditor.classList.toggle('move-ready', Boolean(moveReady));
+  cropEditor.classList.toggle('move-ready', Boolean(insideSelection));
 }
 
 function cropPoint(event) {
