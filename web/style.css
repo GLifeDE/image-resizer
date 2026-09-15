@@ -210,8 +210,7 @@ output { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums
 .check { display: block; margin: 0 0 12px; color: var(--ink); font-size: .82rem; font-weight: 500; }
 .check input { width: auto; min-height: 0; margin-right: 7px; accent-color: var(--accent); }
 .conditional { padding: 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--control); }
-.crop-help, .field-help { margin: 0 0 12px; color: var(--muted); font-size: .75rem; font-weight: 400; }
-.field-help { padding-left: 10px; border-left: 2px solid var(--line-strong); }
+.crop-help { margin: 0 0 12px; color: var(--muted); font-size: .75rem; font-weight: 400; }
 .crop-reset { margin: 0; }
 
 .button {

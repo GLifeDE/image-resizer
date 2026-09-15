@@ -90,7 +90,7 @@
           </fieldset>
 
           <div id="crop-options" class="conditional">
-            <p id="crop-help" class="crop-help">Der Rahmen folgt dem Zielseitenverhältnis. Ziehen Sie ihn zum Verschieben oder an Ecken und Kanten zum Anpassen.</p>
+            <p id="crop-help" class="crop-help">Ziehen Sie außerhalb des Rahmens eine neue Auswahl auf. Im Rahmen verschieben Sie die Auswahl; Ecken und Kanten ändern ihre Größe.</p>
             <button id="reset-crop" class="button secondary compact crop-reset" type="button">Auswahl zurücksetzen</button>
           </div>
           <fieldset class="settings-group output-settings">
@@ -99,7 +99,6 @@
               <label>Ausgabeformat<select name="format" id="format"><option value="jpeg" selected>JPEG</option><option value="webp">WebP</option><option value="png">PNG</option><option value="avif">AVIF</option></select></label>
               <label id="quality-wrap"><span class="label-row">Qualität <output id="quality-value">85</output></span><input name="quality" id="quality" type="range" min="1" max="100" value="85"></label>
             </div>
-            <p id="format-help" class="field-help">JPEG unterstützt keine Transparenz. Transparente Bereiche werden schwarz ausgegeben.</p>
             <label class="check"><input name="stripMetadata" type="checkbox" checked> Metadaten entfernen <small>(inklusive EXIF und GPS)</small></label>
           </fieldset>
           <label class="check live-preview-toggle"><input id="live-preview" type="checkbox" checked> Live-Vorschau <small>(erstellt das Ergebnis automatisch, sobald eine Änderung abgeschlossen ist)</small></label>
