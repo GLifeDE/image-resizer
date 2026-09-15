@@ -11,25 +11,27 @@
 <body>
   <main class="shell">
     <header class="hero">
-      <p class="eyebrow">Lokale Bildverarbeitung <span id="app-version" class="version">dev</span></p>
-      <h1>Image Resizer</h1>
-      <p>Skalieren, zuschneiden und konvertieren. Dateien werden nur für die Verarbeitung im Speicher gehalten.</p>
+      <div>
+        <h1>Image Resizer</h1>
+        <p>Bilder skalieren, zuschneiden und konvertieren.</p>
+      </div>
+      <p class="app-meta"><span>Verarbeitung im Arbeitsspeicher</span><span id="app-version" class="version">dev</span></p>
     </header>
 
     <section class="panel upload-panel" aria-labelledby="upload-heading">
-      <h2 id="upload-heading">Bild hochladen</h2>
+      <h2 id="upload-heading">Bild öffnen</h2>
       <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Bilddatei auswählen oder hier ablegen">
         <input id="file" type="file" accept="image/*,.heic,.heif,.avif" hidden>
-        <div class="drop-icon" aria-hidden="true">+</div>
-        <strong>Bild hier hineinziehen</strong>
-        <span>oder</span>
+        <div class="drop-copy">
+          <strong>Bild hier ablegen</strong>
+          <span>oder aus der Zwischenablage einfügen</span>
+        </div>
         <button id="choose-file" class="button secondary" type="button">Datei auswählen</button>
-        <small>Ein Bild aus der Zwischenablage kann ebenfalls eingefügt werden.</small>
       </div>
       <p id="upload-error" class="notice error" role="alert" hidden></p>
     </section>
 
-    <form id="resize-form" novalidate>
+    <form id="resize-form" novalidate hidden>
       <div class="workspace">
         <section class="panel source-panel" aria-labelledby="source-heading">
           <div class="section-title">
@@ -82,28 +84,22 @@
           </fieldset>
 
           <fieldset class="settings-group mode-group">
-            <legend>Modus</legend>
-            <label class="radio"><input type="radio" name="mode" value="crop"> <span><strong>Füllen und zuschneiden</strong><small>Füllt die Zielgröße ohne Verzerrung. Wählen Sie den sichtbaren Bildausschnitt.</small></span></label>
-            <label class="radio"><input type="radio" name="mode" value="stretch" checked> <span><strong>Exakt dehnen</strong><small>Dehnt das ganze Bild oder einen gewählten Ausschnitt auf die Zielgröße.</small></span></label>
-            <label class="radio"><input type="radio" name="mode" value="fit"> <span><strong>Einpassen</strong><small>Zeigt das ganze Bild innerhalb der Zielgröße mit Hintergrundfläche.</small></span></label>
+            <legend>Skalierung</legend>
+            <label class="radio"><input type="radio" name="mode" value="crop"> <span><strong>Proportional zuschneiden</strong><small>Füllt die Zielgröße ohne Verzerrung.</small></span></label>
+            <label class="radio"><input type="radio" name="mode" value="stretch" checked> <span><strong>Auf Zielgröße strecken</strong><small>Skaliert das ganze Bild oder eine freie Auswahl exakt.</small></span></label>
           </fieldset>
 
           <div id="crop-options" class="conditional">
             <p id="crop-help" class="crop-help">Der Rahmen folgt dem Zielseitenverhältnis. Ziehen Sie ihn zum Verschieben oder die Ecken zum Anpassen.</p>
             <button id="reset-crop" class="button secondary compact crop-reset" type="button">Auswahl zurücksetzen</button>
           </div>
-          <div id="fit-options" class="conditional" hidden>
-            <label>Hintergrund<select name="background" id="background"><option value="black" selected>Schwarz</option><option value="white">Weiß</option><option value="transparent">Transparent</option><option value="custom">Eigene Farbe</option></select></label>
-            <label id="custom-color-wrap" hidden>Eigene Farbe<input id="custom-color" type="color" value="#2b2b36"></label>
-            <p id="background-help" class="conditional-help" hidden>JPEG unterstützt keine Transparenz. Schwarz wird verwendet.</p>
-          </div>
-
           <fieldset class="settings-group output-settings">
             <legend>Ausgabe</legend>
             <div class="field-grid">
               <label>Ausgabeformat<select name="format" id="format"><option value="jpeg" selected>JPEG</option><option value="webp">WebP</option><option value="png">PNG</option><option value="avif">AVIF</option></select></label>
               <label id="quality-wrap"><span class="label-row">Qualität <output id="quality-value">85</output></span><input name="quality" id="quality" type="range" min="1" max="100" value="85"></label>
             </div>
+            <p id="format-help" class="field-help">JPEG unterstützt keine Transparenz. Transparente Bereiche werden schwarz ausgegeben.</p>
             <label class="check"><input name="stripMetadata" type="checkbox" checked> Metadaten entfernen <small>(inklusive EXIF und GPS)</small></label>
           </fieldset>
           <label class="check live-preview-toggle"><input id="live-preview" type="checkbox" checked> Live-Vorschau <small>(erstellt das Ergebnis automatisch, sobald eine Änderung abgeschlossen ist)</small></label>

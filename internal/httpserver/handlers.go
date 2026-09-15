@@ -123,7 +123,6 @@ func parseRequest(r *http.Request) (image.Request, error) {
 		CropTop:       manualCrop.top,
 		CropWidth:     manualCrop.width,
 		CropHeight:    manualCrop.height,
-		Background:    defaultValue(r.FormValue("background"), "black"),
 		StripMetadata: stripMetadata,
 	}, nil
 }
@@ -185,7 +184,7 @@ func processError(err error) (int, string) {
 	switch {
 	case errors.Is(err, image.ErrInvalidDimensions):
 		return http.StatusBadRequest, "Die Zielauflösung ist ungültig oder zu groß."
-	case errors.Is(err, image.ErrInvalidMode), errors.Is(err, image.ErrInvalidFormat), errors.Is(err, image.ErrInvalidQuality), errors.Is(err, image.ErrInvalidCrop), errors.Is(err, image.ErrInvalidManualCrop), errors.Is(err, image.ErrInvalidBackground):
+	case errors.Is(err, image.ErrInvalidMode), errors.Is(err, image.ErrInvalidFormat), errors.Is(err, image.ErrInvalidQuality), errors.Is(err, image.ErrInvalidCrop), errors.Is(err, image.ErrInvalidManualCrop):
 		return http.StatusBadRequest, "Die gewählten Verarbeitungseinstellungen sind ungültig."
 	case errors.Is(err, image.ErrTooManyPixels):
 		return http.StatusRequestEntityTooLarge, "Das Bild hat zu viele Pixel."

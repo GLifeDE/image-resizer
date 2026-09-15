@@ -46,22 +46,6 @@ func TestCropProducesExactDimensionsAndPreservesAspectBeforeCrop(t *testing.T) {
 	}
 }
 
-func TestFitProducesExactDimensionsAndPreservesAspect(t *testing.T) {
-	result := processFixture(t, 400, 300, Request{Width: 1920, Height: 1080, Mode: ModeFit, Format: FormatPNG, Quality: 85, Background: "black", StripMetadata: true})
-	assertDimensions(t, result.Data, 1920, 1080)
-
-	// The 4:3 image is contained at 1440x1080, leaving 240px bars on each side.
-	img := decodePNG(t, result.Data)
-	if img.Bounds().Dx() != 1920 || img.Bounds().Dy() != 1080 {
-		t.Fatalf("got %dx%d", img.Bounds().Dx(), img.Bounds().Dy())
-	}
-	_, outerGreen, outerBlue, _ := img.At(0, 540).RGBA()
-	_, innerGreen, innerBlue, _ := img.At(240, 540).RGBA()
-	if outerGreen != 0 || outerBlue != 0 || innerBlue == 0 || innerGreen == 0 {
-		t.Fatal("fit did not retain the source proportions inside centered black bars")
-	}
-}
-
 func TestManualCropProducesTargetDimensionsAndUsesSelectedArea(t *testing.T) {
 	result := processFixture(t, 400, 300, Request{
 		Width: 1920, Height: 1080, Mode: ModeCrop, Format: FormatPNG, Quality: 85,

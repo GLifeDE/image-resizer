@@ -5,7 +5,6 @@ import "errors"
 const (
 	ModeStretch = "stretch"
 	ModeCrop    = "crop"
-	ModeFit     = "fit"
 )
 
 const (
@@ -22,7 +21,6 @@ var (
 	ErrInvalidQuality    = errors.New("invalid quality")
 	ErrInvalidCrop       = errors.New("invalid crop position")
 	ErrInvalidManualCrop = errors.New("invalid manual crop area")
-	ErrInvalidBackground = errors.New("invalid background color")
 	ErrTooManyPixels     = errors.New("image exceeds pixel limit")
 	ErrUnsupportedImage  = errors.New("unsupported image")
 )
@@ -47,7 +45,6 @@ type Request struct {
 	CropTop       float64
 	CropWidth     float64
 	CropHeight    float64
-	Background    string
 	StripMetadata bool
 }
 

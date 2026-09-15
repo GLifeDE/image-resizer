@@ -9,7 +9,7 @@ Kleines, eigenständiges Web-Tool zum Hochladen, Skalieren, Zuschneiden und Konv
 - Seitenverhältnis-Sperre und Presets für gängige Zielgrößen
 - Seitenverhältnisgebundene Crop-Auswahl für Crop / Cover sowie freie Ausschnittauswahl für Stretch
 - Crop skaliert den ausgewählten Ausschnitt ohne Verzerrung auf die Zielgröße
-- Resize-Modi: Stretch, Crop / Cover und Fit / Contain mit Hintergrundfarbe
+- Resize-Modi: exaktes Strecken sowie proportionales Füllen und Zuschneiden
 - Ausgabe als JPEG, PNG, WebP und AVIF (wenn der Container-Codec AVIF unterstützt)
 - Lokale Originalvorschau sowie serverseitige Ergebnisvorschau und Download
 - Zoom bis 800 % in beiden Vorschauen: Strg + Mausrad oder die Schaltflächen unter der Vorschau, Verschieben mit Alt + Ziehen oder der mittleren Maustaste. Der Crop-Rahmen folgt dem Zoom, das Ergebnis bleibt davon unberührt
@@ -36,11 +36,17 @@ Für den Normalbetrieb ist nur Docker mit aktivem Linux-Container-Daemon erforde
 ## Docker
 
 ```bash
-docker build -t image-resizer .
-docker run --rm -p 8080:8080 image-resizer
+docker run --rm -p 8082:8080 gusja/image-resizer:latest
 ```
 
-Danach ist die Anwendung unter <http://localhost:8080> erreichbar.
+Docker lädt das veröffentlichte Image automatisch von Docker Hub. Danach ist die Anwendung unter <http://localhost:8082> erreichbar. Es werden keine Volumes oder weiteren Dienste benötigt.
+
+Für einen lokalen Build aus dem Repository:
+
+```bash
+docker build -t image-resizer .
+docker run --rm -p 8082:8080 image-resizer
+```
 
 ## Docker Compose
 
@@ -48,7 +54,7 @@ Danach ist die Anwendung unter <http://localhost:8080> erreichbar.
 docker compose up -d --build
 ```
 
-Die Anwendung ist anschließend unter <http://localhost:8080> erreichbar. Beenden mit:
+Die Anwendung ist anschließend unter <http://localhost:8082> erreichbar. Beenden mit:
 
 ```bash
 docker compose down
@@ -74,7 +80,7 @@ Als Ausgabe werden JPEG, PNG, WebP und AVIF angeboten. Die AVIF-Verfügbarkeit s
 
 ## API
 
-`POST /api/resize` akzeptiert `multipart/form-data` mit den Feldern `file`, `width`, `height`, `mode`, `format`, `quality`, `cropX`, `cropY`, `background` und `stripMetadata`. Die Weboberfläche sendet bei Crop zusätzlich `cropLeft`, `cropTop`, `cropWidth` und `cropHeight` als normalisierte Werte zwischen `0` und `1`. Mit `mode=crop` wird der Ausschnitt ohne Verzerrung auf `width` x `height` skaliert; mit `mode=stretch` wird das Bild, oder ein optionaler manueller Ausschnitt, auf diese Größe gedehnt.
+`POST /api/resize` akzeptiert `multipart/form-data` mit den Feldern `file`, `width`, `height`, `mode`, `format`, `quality`, `cropX`, `cropY` und `stripMetadata`. Die Weboberfläche sendet bei Crop zusätzlich `cropLeft`, `cropTop`, `cropWidth` und `cropHeight` als normalisierte Werte zwischen `0` und `1`. Mit `mode=crop` wird der Ausschnitt ohne Verzerrung auf `width` x `height` skaliert; mit `mode=stretch` wird das Bild, oder ein optionaler manueller Ausschnitt, auf diese Größe gedehnt.
 
 ```bash
 curl \
@@ -87,7 +93,7 @@ curl \
   -F "cropX=center" \
   -F "cropY=center" \
   -F "stripMetadata=true" \
-  http://localhost:8080/api/resize \
+  http://localhost:8082/api/resize \
   --output result.webp
 ```
 

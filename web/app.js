@@ -234,8 +234,6 @@ function saveSettings() {
       aspectRatioLocked: aspectRatioLock.getAttribute('aria-pressed') === 'true',
       preset: document.querySelector('#preset').value,
       mode: form.elements.mode.value,
-      background: document.querySelector('#background').value,
-      customColor: document.querySelector('#custom-color').value,
       format: document.querySelector('#format').value,
       quality: document.querySelector('#quality').value,
       stripMetadata: form.elements.stripMetadata.checked,
@@ -258,11 +256,7 @@ function restoreSettings() {
     if (validDimension(settings.height, heightInput)) heightInput.value = settings.height;
     if (typeof settings.aspectRatioLocked === 'boolean') setAspectRatioLock(settings.aspectRatioLocked);
     if (validOption('#preset', settings.preset)) document.querySelector('#preset').value = settings.preset;
-    if (['crop', 'stretch', 'fit'].includes(settings.mode)) form.elements.mode.value = settings.mode;
-    if (validOption('#background', settings.background)) document.querySelector('#background').value = settings.background;
-    if (typeof settings.customColor === 'string' && /^#[0-9a-f]{6}$/i.test(settings.customColor)) {
-      document.querySelector('#custom-color').value = settings.customColor;
-    }
+    if (['crop', 'stretch'].includes(settings.mode)) form.elements.mode.value = settings.mode;
     if (validOption('#format', settings.format)) document.querySelector('#format').value = settings.format;
     if (Number.isInteger(Number(settings.quality)) && Number(settings.quality) >= Number(quality.min) && Number(settings.quality) <= Number(quality.max)) {
       quality.value = settings.quality;
@@ -363,6 +357,8 @@ function selectFile(file) {
   document.querySelector('#result-details').textContent = '';
   resultStatus.textContent = '';
   selectedFile = file;
+  form.hidden = false;
+  document.querySelector('.upload-panel').hidden = true;
   newImage.hidden = false;
   setSubmitDisabled(false);
   document.querySelector('#file-status').textContent = 'Ausgewählt';
@@ -405,6 +401,8 @@ function resetImage() {
   if (sourceURL) URL.revokeObjectURL(sourceURL);
   if (resultURL) URL.revokeObjectURL(resultURL);
   selectedFile = undefined;
+  form.hidden = true;
+  document.querySelector('.upload-panel').hidden = false;
   sourceURL = undefined;
   resultURL = undefined;
   cropState = undefined;
@@ -479,11 +477,6 @@ document.querySelectorAll('input[name="mode"]').forEach((input) => input.addEven
   syncConditionalOptions();
   settingsChanged();
 }));
-document.querySelector('#background').addEventListener('change', () => {
-  syncConditionalOptions();
-  settingsChanged();
-});
-document.querySelector('#custom-color').addEventListener('input', settingsChanged);
 document.querySelector('#format').addEventListener('change', () => {
   syncConditionalOptions();
   settingsChanged();
@@ -501,22 +494,12 @@ function syncConditionalOptions() {
   document.querySelector('#crop-help').textContent = mode === 'crop'
     ? 'Der Rahmen folgt dem Zielseitenverhältnis. Ziehen Sie ihn zum Verschieben oder die Ecken zum Anpassen.'
     : 'Ziehen Sie einen freien Rahmen auf oder passen Sie ihn an den Ecken an. Halten Sie Umschalt gedrückt und ziehen Sie innerhalb des Rahmens zum Verschieben.';
-  document.querySelector('#fit-options').hidden = mode !== 'fit';
-  const isCustom = document.querySelector('#background').value === 'custom';
-  document.querySelector('#custom-color-wrap').hidden = mode !== 'fit' || !isCustom;
   const format = document.querySelector('#format').value;
-  const transparentOption = document.querySelector('#background option[value="transparent"]');
-  const jpeg = format === 'jpeg';
-  transparentOption.disabled = jpeg;
-  const backgroundHelp = document.querySelector('#background-help');
-  if (jpeg && document.querySelector('#background').value === 'transparent') {
-    document.querySelector('#background').value = 'black';
-    backgroundHelp.hidden = false;
-  } else {
-    backgroundHelp.hidden = true;
-  }
   const lossy = ['jpeg', 'webp', 'avif'].includes(format);
   document.querySelector('#quality-wrap').hidden = !lossy;
+  document.querySelector('#format-help').textContent = format === 'jpeg'
+    ? 'JPEG unterstützt keine Transparenz. Transparente Bereiche werden schwarz ausgegeben.'
+    : 'Transparente Bereiche des Originals bleiben in diesem Format erhalten.';
   syncCropEditor();
 }
 restoreSettings();
@@ -859,7 +842,6 @@ function buildRequest() {
     data.set('cropWidth', cropState.width.toFixed(6));
     data.set('cropHeight', cropState.height.toFixed(6));
   }
-  if (data.get('background') === 'custom') data.set('background', document.querySelector('#custom-color').value);
   data.set('stripMetadata', String(form.elements.stripMetadata.checked));
   return data;
 }
@@ -895,7 +877,6 @@ function renderKey() {
     selectedFile.name, selectedFile.size, selectedFile.lastModified,
     widthInput.value, heightInput.value, form.elements.mode.value,
     form.elements.format.value, document.querySelector('#quality').value,
-    document.querySelector('#background').value, document.querySelector('#custom-color').value,
     String(form.elements.stripMetadata.checked),
   ];
   if (manualCropActive()) {

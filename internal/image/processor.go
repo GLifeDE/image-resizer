@@ -3,7 +3,6 @@ package image
 import (
 	"fmt"
 	"math"
-	"strings"
 
 	"github.com/davidbyttow/govips/v2/vips"
 )
@@ -47,8 +46,6 @@ func (p *Processor) Process(input []byte, req Request) (Result, error) {
 		}
 	case ModeCrop:
 		err = crop(img, req)
-	case ModeFit:
-		err = fit(img, req)
 	}
 	if err != nil {
 		return Result{}, fmt.Errorf("transform image: %w", err)
@@ -76,7 +73,7 @@ func (p *Processor) validate(req Request) error {
 	if req.Width <= 0 || req.Height <= 0 || req.Width > p.limits.MaxWidth || req.Height > p.limits.MaxHeight {
 		return ErrInvalidDimensions
 	}
-	if req.Mode != ModeStretch && req.Mode != ModeCrop && req.Mode != ModeFit {
+	if req.Mode != ModeStretch && req.Mode != ModeCrop {
 		return ErrInvalidMode
 	}
 	if req.Format != FormatJPEG && req.Format != FormatPNG && req.Format != FormatWebP && req.Format != FormatAVIF {
@@ -93,14 +90,6 @@ func (p *Processor) validate(req Request) error {
 	}
 	if req.ManualCrop && !validManualCrop(req) {
 		return ErrInvalidManualCrop
-	}
-	if req.Mode == ModeFit {
-		if _, _, _, _, err := parseBackground(req.Background); err != nil {
-			return err
-		}
-		if req.Background == "transparent" && req.Format == FormatJPEG {
-			return ErrInvalidBackground
-		}
 	}
 	return nil
 }
@@ -151,23 +140,6 @@ func manualCropArea(img *vips.ImageRef, req Request) (int, int, int, int) {
 	return left, top, right - left, bottom - top
 }
 
-func fit(img *vips.ImageRef, req Request) error {
-	scale := math.Min(float64(req.Width)/float64(img.Width()), float64(req.Height)/float64(img.Height()))
-	if err := img.Resize(scale, vips.KernelLanczos3); err != nil {
-		return err
-	}
-	r, g, b, a, err := parseBackground(req.Background)
-	if err != nil {
-		return err
-	}
-	if a == 0 && !img.HasAlpha() {
-		if err := img.AddAlpha(); err != nil {
-			return err
-		}
-	}
-	return img.EmbedBackgroundRGBA((req.Width-img.Width())/2, (req.Height-img.Height())/2, req.Width, req.Height, &vips.ColorRGBA{R: r, G: g, B: b, A: a})
-}
-
 func positionedOffset(remaining int, position string) int {
 	if remaining <= 0 {
 		return 0
@@ -189,34 +161,11 @@ func validCrop(value string, horizontal bool) bool {
 	return value == "top" || value == "center" || value == "bottom"
 }
 
-func parseBackground(value string) (uint8, uint8, uint8, uint8, error) {
-	switch value {
-	case "black":
-		return 0, 0, 0, 255, nil
-	case "white":
-		return 255, 255, 255, 255, nil
-	case "transparent":
-		return 0, 0, 0, 0, nil
-	}
-	if len(value) != 7 || !strings.HasPrefix(value, "#") {
-		return 0, 0, 0, 0, ErrInvalidBackground
-	}
-	var r, g, b uint8
-	if _, err := fmt.Sscanf(value, "#%02x%02x%02x", &r, &g, &b); err != nil {
-		return 0, 0, 0, 0, ErrInvalidBackground
-	}
-	return r, g, b, 255, nil
-}
-
 func export(img *vips.ImageRef, req Request) ([]byte, string, string, error) {
 	switch req.Format {
 	case FormatJPEG:
 		if img.HasAlpha() {
-			r, g, b := uint8(0), uint8(0), uint8(0)
-			if req.Mode == ModeFit {
-				r, g, b, _, _ = parseBackground(req.Background)
-			}
-			if err := img.Flatten(&vips.Color{R: r, G: g, B: b}); err != nil {
+			if err := img.Flatten(&vips.Color{R: 0, G: 0, B: 0}); err != nil {
 				return nil, "", "", err
 			}
 		}
